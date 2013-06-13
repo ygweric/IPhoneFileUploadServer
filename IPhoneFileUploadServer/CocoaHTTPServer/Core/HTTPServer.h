@@ -49,8 +49,12 @@
 	NSLock *connectionsLock;
 	NSLock *webSocketsLock;
 	
+    uint16_t localPort;
+    
 	BOOL isRunning;
 }
+
+
 
 /**
  * Specifies the document root to serve files from.

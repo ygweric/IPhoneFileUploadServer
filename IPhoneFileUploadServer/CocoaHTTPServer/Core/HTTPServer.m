@@ -397,6 +397,7 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 	
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Server Control
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -413,14 +414,27 @@ static const int httpLogLevel = HTTP_LOG_LEVEL_INFO; // | HTTP_LOG_FLAG_TRACE;
 		success = [asyncSocket acceptOnInterface:interface port:port error:&err];
 		if (success)
 		{
-			HTTPLogInfo(@"%@: Started HTTP server on port %hu", THIS_FILE, [asyncSocket localPort]);
-			
+//			HTTPLogInfo(@"%@: Started HTTP server on port %hu", THIS_FILE, [asyncSocket localPort]);
+            
+            
+            do {
+                if(httpLogLevel & HTTP_LOG_FLAG_INFO){
+                     localPort=[asyncSocket localPort];
+                NSLog(@"port:%d",localPort);
+                    LOG_MACRO(HTTP_LOG_ASYNC_INFO, httpLogLevel, HTTP_LOG_FLAG_INFO, HTTP_LOG_CONTEXT, nil, sel_getName(_cmd), @"%@: Started HTTP server on port %hu", THIS_FILE, localPort);
+                }
+            } while(0);
+            NSNotificationCenter *nc=[NSNotificationCenter defaultCenter];
+            [nc postNotificationName:@"HTTPServer_get_port_success" object:self userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedShort:localPort] forKey:@"local_port"]];
+
 			isRunning = YES;
 			[self publishBonjour];
 		}
 		else
 		{
 			HTTPLogError(@"%@: Failed to start HTTP Server: %@", THIS_FILE, err);
+            NSNotificationCenter *nc=[NSNotificationCenter defaultCenter];
+            [nc postNotificationName:@"HTTPServer_get_port_fail" object:self ];
 		}
 	}});
 	

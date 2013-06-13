@@ -16,7 +16,14 @@
 
 @implementation AppDelegate
 
-
+-(void)handlerPortSuccess:(NSNotification *)notification{
+    NSDictionary* userInfo=notification.userInfo;
+    NSNumber* port=[userInfo valueForKey:@"local_port"];
+    NSLog(@"handlerPortSuccess----port:%d",port.unsignedShortValue);
+}
+-(void)handlerPortFail:(NSNotification *)notification{
+    NSLog(@"handlerPortFail-----");
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -26,6 +33,10 @@
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
     
+    
+    NSNotificationCenter *nc=[NSNotificationCenter defaultCenter];
+    [nc addObserver:self selector:@selector(handlerPortSuccess:) name:@"HTTPServer_get_port_success" object:nil];
+    [nc addObserver:self selector:@selector(handlerPortFail:) name:@"HTTPServer_get_port_fail" object:nil];
     
     
     // Configure our logging framework.
